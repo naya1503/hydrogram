@@ -1,0 +1,50 @@
+name: Checkout and Modify Code
+
+on:
+  workflow_dispatch:
+    inputs:
+      OLD_FOLDER: 
+        description: 'Old folder name to rename (optional)'
+        required: false
+      NEW_FOLDER: 
+        description: 'New folder name (optional)'
+        required: false
+      OLD_CODE: 
+        description: 'Old code to replace (optional)'
+        required: false
+      NEW_CODE: 
+        description: 'New code to replace with (optional)'
+        required: false
+      REMOVE_CODE:
+        description: 'Code to remove (optional)'
+        required: false
+      REMOVE_FOLDER: 
+        description: 'Folder to remove (optional)'
+        required: false
+
+jobs:
+  core_code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Rename folder
+        if: ${{ github.event.inputs.OLD_FOLDER && github.event.inputs.NEW_FOLDER }}
+        run: mv "${{ github.event.inputs.OLD_FOLDER }}" "${{ github.event.inputs.NEW_FOLDER }}"
+
+      - name: Rename Code 
+        if: ${{ github.event.inputs.OLD_CODE && github.event.inputs.NEW_CODE }}
+        run: find . -type f -name '*.py' -exec sed -i "s|${{ github.event.inputs.OLD_CODE }}|${{ github.event.inputs.NEW_CODE }}|g" {} +
+
+      - name: Remove kode
+        if: ${{ github.event.inputs.REMOVE_CODE }}
+        run: find . -type f -name "*.py" -exec sed -i "s|${{ github.event.inputs.REMOVE_CODE }}||g" {} \;
+
+      - name: Remove Folder 
+        if: ${{ github.event.inputs.REMOVE_FOLDER }}
+        run: find . -type d -name "${{ github.event.inputs.REMOVE_FOLDER }}" -exec rm -rf {} +
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
