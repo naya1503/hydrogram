@@ -65,7 +65,7 @@ class RPCError(Exception):
                 f.write(f"{datetime.now()}\t{value}\t{rpc_name}\n")
 
     @staticmethod
-    def raise_it(rpc_error: raw.types.RpcError, rpc_type: type[TLObject]):
+    def raise_it(rpc_error: "raw.types.RpcError", rpc_type: Type[TLObject]):
         error_code = rpc_error.error_code
         is_signed = error_code < 0
         error_message = rpc_error.error_message
